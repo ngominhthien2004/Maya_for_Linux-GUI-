@@ -115,13 +115,19 @@ RUN sed -i 's/\r$//' start_licensing_service.sh && \
 RUN echo '#!/bin/bash' > /usr/local/bin/license_monitor.sh && \
     echo 'LICENSING_SERVICE_PID=$1' >> /usr/local/bin/license_monitor.sh && \
     echo 'echo "[Monitor] Started with licensing service PID: $LICENSING_SERVICE_PID"' >> /usr/local/bin/license_monitor.sh && \
+    echo 'declare -A HIGH_CPU_COUNT' >> /usr/local/bin/license_monitor.sh && \
 echo 'while true; do' >> /usr/local/bin/license_monitor.sh && \
-    echo '  HIGH_CPU_AGENTS=$(ps aux | awk '"'"'/AdskLicensingAgent/ && $3 > 50.0 && !/awk/ {print $2}'"'"')' >> /usr/local/bin/license_monitor.sh && \
+    echo '  HIGH_CPU_AGENTS=$(ps aux | awk '"'"'/AdskLicensingAgent/ && $3 > 95.0 && !/awk/ {print $2}'"'"')' >> /usr/local/bin/license_monitor.sh && \
     echo '  if [ ! -z "$HIGH_CPU_AGENTS" ]; then' >> /usr/local/bin/license_monitor.sh && \
-    echo '    echo "[$(date)] Found high CPU agents, killing..."' >> /usr/local/bin/license_monitor.sh && \
     echo '    for pid in $HIGH_CPU_AGENTS; do' >> /usr/local/bin/license_monitor.sh && \
-    echo '      echo "[$(date)] Killing agent PID: $pid"' >> /usr/local/bin/license_monitor.sh && \
-    echo '      kill -9 $pid 2>/dev/null' >> /usr/local/bin/license_monitor.sh && \
+    echo '      HIGH_CPU_COUNT[$pid]=$((${HIGH_CPU_COUNT[$pid]:-0} + 1))' >> /usr/local/bin/license_monitor.sh && \
+    echo '      if [ ${HIGH_CPU_COUNT[$pid]} -ge 3 ]; then' >> /usr/local/bin/license_monitor.sh && \
+    echo '        echo "[$(date)] Agent PID $pid stuck at high CPU for 30s, killing..."' >> /usr/local/bin/license_monitor.sh && \
+    echo '        kill -9 $pid 2>/dev/null' >> /usr/local/bin/license_monitor.sh && \
+    echo '        unset HIGH_CPU_COUNT[$pid]' >> /usr/local/bin/license_monitor.sh && \
+    echo '      else' >> /usr/local/bin/license_monitor.sh && \
+    echo '        echo "[$(date)] Agent PID $pid high CPU (${HIGH_CPU_COUNT[$pid]}/3)"' >> /usr/local/bin/license_monitor.sh && \
+    echo '      fi' >> /usr/local/bin/license_monitor.sh && \
     echo '    done' >> /usr/local/bin/license_monitor.sh && \
     echo '  fi' >> /usr/local/bin/license_monitor.sh && \
     echo '  if ! ps -p $LICENSING_SERVICE_PID > /dev/null 2>&1; then' >> /usr/local/bin/license_monitor.sh && \
