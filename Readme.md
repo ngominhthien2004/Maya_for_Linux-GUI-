@@ -1,7 +1,7 @@
 # Maya for Linux
 Autodesk id:
-email: thienb2205910@student.ctu.edu.vn
-password: NgoMinhThien22@
+email: 
+password: 
 ## About
 
 This repository contains scripts and instructions to help install and run Autodesk Maya on Linux systems.
