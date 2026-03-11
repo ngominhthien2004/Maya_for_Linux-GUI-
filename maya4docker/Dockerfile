@@ -75,12 +75,12 @@ WORKDIR /install/Packages
 
 # For Licencing
 RUN yum install -y adskflexnetclient-11.18.0-0.x86_64.rpm \
-    adlmapps28-28.0.11-0.x86_64.rpm \
-    adsklicensing13.0.0.8122-0-0.x86_64.rpm \
+    adlmapps29-29.0.2-0.x86_64.rpm \
+    adsklicensing13.3.1.9694-0-0.x86_64.rpm \
     adskflexnetserverIPV6-11.18.0-0.x86_64.rpm
 
 # Maya
-RUN yum install -y Maya2024_64-2024.0-4763.x86_64.rpm
+RUN yum install -y Maya2024_64-2024.2-180.x86_64.rpm
 
 # Create required directories with proper permissions
 RUN mkdir -p /var/opt/Autodesk/AdskLicensingService && \
@@ -177,7 +177,7 @@ echo '/opt/Autodesk/AdskLicensing/Current/AdskLicensingService/AdskLicensingServ
     chmod +x /home/user/start_vnc.sh
 
 # Set environment
-ENV LD_LIBRARY_PATH=/opt/Autodesk/AdskLicensing/13.0.0.8122/AdskLicensingAgent/lib
+ENV LD_LIBRARY_PATH=/opt/Autodesk/AdskLicensing/13.3.1.9694/AdskLicensingAgent/lib
 ENV MAYA_DISABLE_CIP=1
 ENV MAYA_DISABLE_CER=1
 
